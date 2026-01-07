@@ -1,0 +1,29 @@
+<header>
+  <div class="container header-container">
+    <a class="logo" routerLink="/">
+      <i class="fas fa-shopping-bag"></i>
+      Vogue<span>Threads</span>
+    </a>
+
+    <nav>
+      <ul>
+        <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a></li>
+        <li><a routerLink="/products" routerLinkActive="active">Shop</a></li>
+        <li><a routerLink="/account" routerLinkActive="active">Account</a></li>
+        <li><a routerLink="/checkout" routerLinkActive="active">Checkout</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <i class="fas fa-search" aria-label="Search"></i>
+      <i class="fas fa-heart" aria-label="Wishlist"></i>
+      <a class="cart" routerLink="/checkout" aria-label="Cart">
+        <i class="fas fa-shopping-cart">
+          <span class="cart-count">{{ cartCount }}</span>
+        </i>
+      </a>
+      <a class="user" routerLink="/account" aria-label="Account"><i class="fas fa-user"></i></a>
+    </div>
+  </div>
+</header>
+

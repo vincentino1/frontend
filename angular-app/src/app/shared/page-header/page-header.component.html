@@ -1,0 +1,17 @@
+<section class="page-header">
+  <div class="container">
+    <div class="page-title">
+      <h1>{{ title }}</h1>
+      <p *ngIf="subtitle">{{ subtitle }}</p>
+    </div>
+
+    <div class="breadcrumb" *ngIf="breadcrumbs?.length">
+      <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
+        <a *ngIf="crumb.link" [routerLink]="crumb.link">{{ crumb.label }}</a>
+        <span *ngIf="!crumb.link">{{ crumb.label }}</span>
+        <i class="fas fa-chevron-right" *ngIf="!last"></i>
+      </ng-container>
+    </div>
+  </div>
+</section>
+

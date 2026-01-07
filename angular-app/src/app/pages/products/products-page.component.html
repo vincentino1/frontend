@@ -1,0 +1,80 @@
+<app-page-header
+  title="Collection"
+  subtitle="Explore our latest selection"
+  [breadcrumbs]="[{ label: 'Home', link: '/' }, { label: 'Shop' }]"
+></app-page-header>
+
+<section class="main-content">
+  <div class="container">
+    <div class="content-wrapper">
+      <aside class="filters-sidebar">
+        <div class="filter-section">
+          <div class="filter-title">
+            <span>Categories</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="filter-options">
+            <div class="filter-option">
+              <input type="checkbox" id="men" />
+              <label for="men"><span>Men</span><span class="filter-count">12</span></label>
+            </div>
+            <div class="filter-option">
+              <input type="checkbox" id="women" />
+              <label for="women"><span>Women</span><span class="filter-count">18</span></label>
+            </div>
+            <div class="filter-option">
+              <input type="checkbox" id="acc" />
+              <label for="acc"><span>Accessories</span><span class="filter-count">7</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-title">
+            <span>Price</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="price-range">
+            <div class="price-slider"><div class="progress"></div></div>
+            <div class="price-input">
+              <div class="price-field"><span>$</span><input class="price" value="0" /></div>
+              <div class="price-field"><span>$</span><input class="price" value="200" /></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="products">
+        <div class="products-header">
+          <h2>Products</h2>
+          <div class="sort">
+            <label>Sort</label>
+            <select>
+              <option>Featured</option>
+              <option>Price: Low to High</option>
+              <option>Price: High to Low</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="products-grid">
+          <article class="product-card" *ngFor="let p of [1,2,3,4,5,6,7,8]">
+            <div class="product-image">
+              <img
+                src="https://images.unsplash.com/photo-1520975439133-4c3bde6bb77b?auto=format&fit=crop&w=1200&q=80"
+                alt="Product"
+                loading="lazy"
+              />
+            </div>
+            <div class="product-info">
+              <h3>Urban Staple</h3>
+              <p class="price">$59.00</p>
+              <button class="btn">Add to Cart</button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
+

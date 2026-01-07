@@ -1,0 +1,43 @@
+.page-header {
+  background: linear-gradient(135deg, var(--primary) 0%, #1a1e2e 100%);
+  color: white;
+  padding: 90px 0 50px;
+}
+
+.page-header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.page-title h1 {
+  font-size: 2.8rem;
+  margin-bottom: 10px;
+}
+
+.page-title p {
+  color: var(--light-gray);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--light-gray);
+}
+
+.breadcrumb a {
+  color: var(--light-gray);
+  transition: var(--transition);
+}
+
+.breadcrumb a:hover {
+  color: white;
+}
+
+.breadcrumb i {
+  font-size: 12px;
+}
+

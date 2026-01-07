@@ -1,0 +1,129 @@
+<app-page-header
+  title="Checkout"
+  subtitle="Complete your purchase"
+  [breadcrumbs]="[{ label: 'Home', link: '/' }, { label: 'Checkout' }]"
+></app-page-header>
+
+<section class="checkout-progress">
+  <div class="container progress-container">
+    <div class="progress-step" [class.active]="isShipping" [class.completed]="step > 1" (click)="go(1)">
+      <div class="step-number">
+        <span *ngIf="step <= 1">1</span>
+        <i *ngIf="step > 1" class="fas fa-check"></i>
+      </div>
+      <div class="step-info">
+        <h4>Shipping</h4>
+        <p>Address details</p>
+      </div>
+    </div>
+
+    <div class="progress-connector" [class.completed]="step > 1"></div>
+
+    <div class="progress-step" [class.active]="isPayment" [class.completed]="step > 2" (click)="go(2)">
+      <div class="step-number">
+        <span *ngIf="step <= 2">2</span>
+        <i *ngIf="step > 2" class="fas fa-check"></i>
+      </div>
+      <div class="step-info">
+        <h4>Payment</h4>
+        <p>Secure payment</p>
+      </div>
+    </div>
+
+    <div class="progress-connector" [class.completed]="step > 2"></div>
+
+    <div class="progress-step" [class.active]="isReview" (click)="go(3)">
+      <div class="step-number">3</div>
+      <div class="step-info">
+        <h4>Review</h4>
+        <p>Confirm order</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="checkout-content">
+  <div class="container">
+    <div class="checkout-wrapper">
+      <div class="checkout-form-container">
+        <section class="checkout-section" [class.active]="isShipping">
+          <div class="section-header">
+            <div class="section-icon"><i class="fas fa-truck"></i></div>
+            <h2 class="section-title">Shipping Details</h2>
+          </div>
+          <p class="section-subtitle">Where should we deliver your order?</p>
+
+          <div class="form-row">
+            <div class="form-group required">
+              <label>First Name</label>
+              <input class="form-control" />
+            </div>
+            <div class="form-group required">
+              <label>Last Name</label>
+              <input class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group full-width required">
+              <label>Address</label>
+              <input class="form-control" />
+            </div>
+          </div>
+
+          <button class="btn" (click)="go(2)">Continue to Payment</button>
+        </section>
+
+        <section class="checkout-section" [class.active]="isPayment">
+          <div class="section-header">
+            <div class="section-icon"><i class="fas fa-credit-card"></i></div>
+            <h2 class="section-title">Payment</h2>
+          </div>
+          <p class="section-subtitle">Pay securely with your preferred method.</p>
+
+          <div class="form-row">
+            <div class="form-group full-width required">
+              <label>Card Number</label>
+              <input class="form-control" />
+            </div>
+          </div>
+
+          <button class="btn btn-outline" (click)="go(1)">Back</button>
+          <button class="btn" style="margin-left: 10px" (click)="go(3)">Review Order</button>
+        </section>
+
+        <section class="checkout-section" [class.active]="isReview">
+          <div class="section-header">
+            <div class="section-icon"><i class="fas fa-clipboard-check"></i></div>
+            <h2 class="section-title">Review</h2>
+          </div>
+          <p class="section-subtitle">Confirm your details before placing the order.</p>
+
+          <div class="review-box">
+            <p><strong>Shipping:</strong> (demo) 1 Fashion St, Lagos</p>
+            <p><strong>Payment:</strong> (demo) **** **** **** 4242</p>
+          </div>
+
+          <button class="btn btn-outline" (click)="go(2)">Back</button>
+          <button class="btn" style="margin-left: 10px">Place Order</button>
+        </section>
+      </div>
+
+      <aside class="order-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-item" *ngFor="let item of [1,2,3]">
+          <div>
+            <div class="name">Item {{ item }}</div>
+            <div class="muted">Qty 1</div>
+          </div>
+          <div class="price">$39.00</div>
+        </div>
+        <div class="summary-total">
+          <span>Total</span>
+          <span>$117.00</span>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
