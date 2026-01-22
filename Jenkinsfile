@@ -15,9 +15,7 @@ properties([
 ])
 
 pipeline {
-    agent {
-        docker {image 'node:20.9.0'}      
-    }
+    agent none
 
         environment {
         // credentials for git
@@ -45,7 +43,7 @@ pipeline {
 
                 script {
                     env.branchName = env.ref.replace('refs/heads/', '')
-                    echo "Checking out branch: ${branchName}"   
+                    echo "Checking out branch: ${env.branchName}"   
                 }
                 git(
                     branch: env.branchName,
@@ -56,6 +54,9 @@ pipeline {
         }
 
         stage('Install Dependencies') {
+            agent {
+                 docker {image 'node:20.9'} 
+            }
             steps {
                 dir('angular-app') {
                     sh 'npm install'
@@ -64,14 +65,14 @@ pipeline {
         }
         
         stage('Build Angular app') {
+            agent {
+                 docker {image 'node:20.9'} 
+            }    
             steps {
                 dir('angular-app') {
                     sh 'npm run build --prod'
-
                 }
             }
         }
-
-
     }
 }
