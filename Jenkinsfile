@@ -15,15 +15,13 @@ properties([
 ])
 
 pipeline {
-    agent any
+    agent {
+        docker {image 'node:20.20-alpine'}      
+    }
 
         environment {
         // credentials for git
         GIT_CREDENTIALS = 'Git_Credential'
-    }
-    
-    tools {
-        nodejs 'node20' // Name must match the one you configured in Jenkins
     }
     
     stages {
