@@ -28,17 +28,17 @@ pipeline {
     
     stages {
 
-        stage('Clean Workspace') {
-            steps {
-                echo "Deleting workspace..."
-                cleanWs()   // or use deleteDir()
-            }
-        }
-
         stage('Webhook Debug') {
             steps {
                 echo "Branch: ${env.ref}"
                 echo "Repo: ${env.repo_name}"
+            }
+        }
+
+        stage('Clean Workspace') {
+            steps {
+                echo "Deleting workspace..."
+                cleanWs()   // or use deleteDir()
             }
         }
         
