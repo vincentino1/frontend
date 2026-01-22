@@ -19,7 +19,7 @@ pipeline {
 
     environment {
         // credentials for git
-    GIT_CREDENTIALS = 'Git_Credential'
+    GIT_CREDENTIALS = "${env.GIT_CREDENTIALS}"
     
     tools {
         nodejs 'node20' // Name must match the one you configured in Jenkins
