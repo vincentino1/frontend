@@ -47,7 +47,8 @@ pipeline {
 
                 script {
                     def branchName = env.ref.replace('refs/heads/', '')
-                    echo "Checking out branch: ${branchName}"          
+                    echo "Checking out branch: ${branchName}"   
+                }
                 git(
                     branch: "${env.branchName}",
                     credentialsId: "${env.GIT_CREDENTIALS}",
