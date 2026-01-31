@@ -60,7 +60,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir('angular-app') {
-                    sh 'npm install -g @angular/cli@latest'
+                    
                     sh 'npm install'
                 }
             }
@@ -69,7 +69,7 @@ pipeline {
     stage('Unit Tests') {
         steps {
             dir('angular-app') {
-                sh 'npm run test'
+                sh 'npm run test:ci'
             }
         }
     }
