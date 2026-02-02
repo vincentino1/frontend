@@ -69,7 +69,7 @@ pipeline {
     stage('Unit Tests') {
         steps {
             dir('angular-app') {
-                sh 'npm run test:ci'
+                sh 'npm run test'
             }
         }
     }
