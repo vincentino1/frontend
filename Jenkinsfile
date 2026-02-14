@@ -112,34 +112,6 @@ email=myapp-developer@test.com
             }
         }
 
-        stage('Publish NPM Package') {
-            when { expression { return env.branchName == 'main'}}
-            
-            steps {
-                dir('angular-app') {
-                    withCredentials([
-                        string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'NEXUS_NPM_TOKEN')
-                    ]) {
-                        writeFile file: '.npmrc', text: """
-registry=https://16-52-79-103.sslip.io/repository/myapp-npm-hosted/
-always-auth=true
-//16-52-79-103.sslip.io/repository/myapp-npm-hosted/:_auth=\${NEXUS_NPM_TOKEN}
-email=myapp-developer@test.com
-"""
-                        sh 'npm publish'
-                    }
-                }
-            }
-
-            post {
-                always {
-                    dir('angular-app') {
-                        sh 'rm -f .npmrc'
-                    }
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 dir('angular-app') {
@@ -147,8 +119,9 @@ email=myapp-developer@test.com
 
                         def pkg = readJSON file: 'package.json'
                         def appName = pkg.name
+                        def appVersion = pkg.version
 
-                        env.IMAGE_NAME = "${REGISTRY_HOSTNAME}/${DOCKER_REPO}/${appName}:v${BUILD_NUMBER}"
+                        env.IMAGE_NAME = "${REGISTRY_HOSTNAME}/${DOCKER_REPO}/${appName}:v${appVersion}-${BUILD_NUMBER}"
 
                         docker.withRegistry("${REVERSE_PROXY_BASE_URL}", "${DOCKER_CREDENTIALS_ID}") {
                             docker.build(env.IMAGE_NAME)
