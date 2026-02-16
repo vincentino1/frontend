@@ -33,7 +33,6 @@ pipeline {
 
         // Nexus npm registry configuration
         NPM_REGISTRY_URL       = '3-98-125-121.sslip.io' 
-        NPM_ALWAYS_AUTH        = 'true'
 
         // Docker credentials ID (Username/Password type in Jenkins)
         DOCKER_CREDENTIALS_ID  = 'docker-registry-creds'
@@ -111,7 +110,7 @@ email=jenkins@example.com
                     sh 'npm install --no-audit --no-fund puppeteer'
 
                     // Set CHROME_BIN to Puppeteer Chromium
-                    withEnv(["CHROME_BIN=$(node -p \"require('puppeteer').executablePath()\")"]) {
+                    withEnv(['CHROME_BIN=$(node -p "require(\'puppeteer\').executablePath()")']) {
                         sh 'npm run test:ci'
                     }
                 }
