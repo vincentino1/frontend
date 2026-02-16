@@ -32,7 +32,7 @@ pipeline {
         REVERSE_PROXY_BASE_URL = 'https://3-98-125-121.sslip.io'
 
         // Nexus npm registry configuration
-        NPM_REGISTRY_URL = 'https://3-98-125-121.sslip.io/repository/myapp-npm-group/' 
+        NPM_REGISTRY_URL = '3-98-125-121.sslip.io' 
         NPM_ALWAYS_AUTH  = 'true'
     
 
@@ -84,11 +84,17 @@ pipeline {
                         string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'NPM_TOKEN')
                     ]) {
                         writeFile file: '.npmrc', text: """
-registry=${NPM_REGISTRY_URL}
-always-auth=${NPM_ALWAYS_AUTH}
-${NPM_REGISTRY_URL}:_auth=\${NPM_TOKEN}
+registry=https://${REGISTRY_HOSTNAME}/repository/myapp-npm-group/
+always-auth=true
+//${REGISTRY_HOSTNAME}/repository/myapp-npm-group/:_auth=${NPM_TOKEN}
 email=jenkins@example.com
-"""
+"""                     
+                        // Debug prints (token masked in console output)
+                        sh 'cat .npmrc | sed "s/${NPM_TOKEN}/***MASKED***/g" || true'
+                        sh 'npm config list | grep -i auth || true'
+                        sh 'echo "NPM_TOKEN length: ${#NPM_TOKEN}"'  // should print ~20+ if set
+                        sh 'npm whoami || echo "whoami failed - auth issue"'
+                        sh 'npm ci --verbose'
                         sh 'npm ci'
                         sh 'npm whoami'  // Verify auth
                     }
