@@ -76,7 +76,7 @@ pipeline {
                 )
             }
         }
-
+ 
         stage('Install Dependencies') {
             steps {
                 dir('angular-app') {
