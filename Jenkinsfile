@@ -83,12 +83,14 @@ pipeline {
                     withCredentials([
                         string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'NPM_TOKEN')
                     ]) {
-                        writeFile file: '.npmrc', text: """
+                        writeFile file: '.npmrc', 
+                                  text: """
 registry=https://${REGISTRY_HOSTNAME}/repository/myapp-npm-group/
 always-auth=true
 //${REGISTRY_HOSTNAME}/repository/myapp-npm-group/:_auth=${NPM_TOKEN}
 email=jenkins@example.com
-"""                     sh 'npm install -g @angular/cli@latest'
+"""                     
+                        sh 'npm install -g @angular/cli@latest'
                         sh 'npm install'
                         sh 'npm whoami'  // Verify auth
                     }
