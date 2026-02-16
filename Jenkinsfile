@@ -107,6 +107,9 @@ email=jenkins@example.com
         stage('Unit Tests') {
             steps {
                 dir('angular-app') {
+                    withEnv(["CHROME_BIN=$(node -p \"require('puppeteer').executablePath()\")"]) {
+                    sh 'npm run test:ci'
+                    }
                     sh 'npm run test:ci'
                 }
             }
