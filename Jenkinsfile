@@ -32,11 +32,15 @@ pipeline {
 
         // Nexus Docker Registry ENV
         DOCKER_REPO           = 'myapp-docker-hosted'
-        REGISTRY_HOSTNAME     = '16-52-79-103.sslip.io'
-        REVERSE_PROXY_BASE_URL = 'https://16-52-79-103.sslip.io'
+        REGISTRY_HOSTNAME     = '3-98-125-121.sslip.io'
+        REVERSE_PROXY_BASE_URL = 'https://3-98-125-121.sslip.io'
+
+        NPM_REGISTRY_URL = 'http://3-98-125-121.sslip.io/repository/myapp-npm-group/' 
+        NPM_ALWAYS_AUTH = 'true' 
+        NPM_AUTH_TOKEN = "${NEXUS_NPM_TOKEN}"
 
         // Docker credentials ID (must be Username/Password type in Jenkins)
-        DOCKER_CREDENTIALS_ID = 'NEXUS_DOCKER_CREDENTIALS'
+        DOCKER_CREDENTIALS_ID = 'docker-registry-creds'
     }
 
     stages {
@@ -82,9 +86,9 @@ pipeline {
                         string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'NEXUS_NPM_TOKEN')
                     ]) {
                         writeFile file: '.npmrc', text: """
-registry=https://16-52-79-103.sslip.io/repository/myapp-npm-group/
-always-auth=true
-//16-52-79-103.sslip.io/repository/myapp-npm-group/:_auth=\${NEXUS_NPM_TOKEN}
+registry=${NPM_REGISTRY_URL}
+always-auth=${NPM_ALWAYS_AUTH}
+${NPM_REGISTRY_URL}:_auth=\${NEXUS_NPM_TOKEN}
 """
                         sh 'npm ci'
                         sh 'npm whoami'  // Verify auth
