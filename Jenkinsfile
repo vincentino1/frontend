@@ -36,6 +36,8 @@ pipeline {
 
         // Docker credentials ID (must be Username/Password type in Jenkins)
         DOCKER_CREDENTIALS_ID = 'docker-registry-creds'
+
+        NODE_EXTRA_CA_CERTS = "/etc/ssl/certs/ca-certificates.crt"
     }
 
     stages {
