@@ -9,8 +9,9 @@ properties([
                 [key: 'repo_name', value: '$.repository.name']
             ],
             regexpFilterText: '$repo_name:$ref',
-            regexpFilterExpression: '^.+:refs/heads/.+$'
-        ] 
+            // Only trigger on main branch
+            regexpFilterExpression: '^.+:refs/heads/main$'
+        ]
     ])
 ])
 
@@ -36,8 +37,7 @@ pipeline {
         REVERSE_PROXY_BASE_URL = 'https://3-98-125-121.sslip.io'
 
         NPM_REGISTRY_URL = 'http://3-98-125-121.sslip.io/repository/myapp-npm-group/' 
-        NPM_ALWAYS_AUTH = 'true' 
-        NPM_AUTH_TOKEN = "${NEXUS_NPM_TOKEN}"
+        NPM_ALWAYS_AUTH  = 'true'
 
         // Docker credentials ID (must be Username/Password type in Jenkins)
         DOCKER_CREDENTIALS_ID = 'docker-registry-creds'
@@ -62,11 +62,9 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-
                     if (!env.ref) {
                         error "Webhook did not provide 'ref'. Cannot determine branch."
                     }
-
                     env.branchName = env.ref.replace('refs/heads/', '')
                     echo "Checking out branch: ${env.branchName}"
                 }
@@ -89,6 +87,7 @@ pipeline {
 registry=${NPM_REGISTRY_URL}
 always-auth=${NPM_ALWAYS_AUTH}
 ${NPM_REGISTRY_URL}:_auth=\${NEXUS_NPM_TOKEN}
+always-auth=${NPM_ALWAYS_AUTH}
 """
                         sh 'npm ci'
                         sh 'npm whoami'  // Verify auth
@@ -98,7 +97,7 @@ ${NPM_REGISTRY_URL}:_auth=\${NEXUS_NPM_TOKEN}
 
             post {
                 always {
-                    dir('angular-app') { sh 'rm -f .npmrc'}
+                    dir('angular-app') { sh 'rm -f .npmrc' }
                 }
             }
         }
@@ -107,7 +106,6 @@ ${NPM_REGISTRY_URL}:_auth=\${NEXUS_NPM_TOKEN}
             steps {
                 dir('angular-app') {
                     sh 'npm run test:ci'
-
                 }
             }
         }
@@ -124,7 +122,6 @@ ${NPM_REGISTRY_URL}:_auth=\${NEXUS_NPM_TOKEN}
             steps {
                 dir('angular-app') {
                     script {
-
                         def pkg = readJSON file: 'package.json'
                         def appName = pkg.name
                         def appVersion = pkg.version
@@ -132,7 +129,7 @@ ${NPM_REGISTRY_URL}:_auth=\${NEXUS_NPM_TOKEN}
                         env.IMAGE_NAME = "${REGISTRY_HOSTNAME}/${DOCKER_REPO}/${appName}:v${appVersion}-${BUILD_NUMBER}"
 
                         docker.withRegistry("${REVERSE_PROXY_BASE_URL}", "${DOCKER_CREDENTIALS_ID}") {
-                            docker.build(env.IMAGE_NAME)
+                            docker.build(env.IMAGE_NAME, '.')
                         }
 
                         echo "Built image: ${env.IMAGE_NAME}"
@@ -143,7 +140,7 @@ ${NPM_REGISTRY_URL}:_auth=\${NEXUS_NPM_TOKEN}
 
         stage('Push Docker Image to Nexus') {
             when { 
-                expression { return env.branchName == 'main'}
+                expression { return env.branchName == 'main' }
             }
             steps {
                 script {
@@ -151,23 +148,25 @@ ${NPM_REGISTRY_URL}:_auth=\${NEXUS_NPM_TOKEN}
                         docker.image(env.IMAGE_NAME).push()
                         docker.image(env.IMAGE_NAME).push('latest')
                     }
-
                     echo "Pushed Docker image: ${env.IMAGE_NAME}"
-
                 }
             }
         }
     }
 
     post {
-
         always {
-            sh 'docker rmi ${IMAGE_NAME} || true'  // Cleanup
+            script {
+                if (env.IMAGE_NAME) {
+                    sh "docker rmi ${env.IMAGE_NAME} || true"  // Safe cleanup
+                }
+            }
         }
-        
+
         success {
             echo 'Pipeline completed successfully.'
         }
+
         failure {
             echo 'The pipeline encountered an error and did not complete successfully.'
         }
