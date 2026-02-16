@@ -81,12 +81,12 @@ pipeline {
             steps {
                 dir('angular-app') {
                     withCredentials([
-                        string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'NEXUS_NPM_TOKEN')
+                        string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'NPM_TOKEN')
                     ]) {
                         writeFile file: '.npmrc', text: """
 registry=${NPM_REGISTRY_URL}
 always-auth=${NPM_ALWAYS_AUTH}
-${NPM_REGISTRY_URL}:_auth=${NPM_TOKEN}
+${NPM_REGISTRY_URL}:_auth=\${NPM_TOKEN}
 email=jenkins@example.com
 """
                         sh 'npm ci'
