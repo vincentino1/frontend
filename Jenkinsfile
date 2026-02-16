@@ -91,7 +91,7 @@ always-auth=true
 email=jenkins@example.com
 """                     
                         sh 'npm install -g @angular/cli@latest'
-                        sh 'npm ci'
+                        sh 'npm install'
                         sh 'npm whoami'  // Verify auth
                     }
                 }
