@@ -110,7 +110,6 @@ email=jenkins@example.com
                     withEnv(["CHROME_BIN=$(node -p \"require('puppeteer').executablePath()\")"]) {
                     sh 'npm run test:ci'
                     }
-                    sh 'npm run test:ci'
                 }
             }
         }
