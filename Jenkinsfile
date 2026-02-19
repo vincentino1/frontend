@@ -25,19 +25,15 @@ pipeline {
     environment {
         // Git
         GIT_CREDENTIALS = 'github-creds'
+        GIT_BRANCH_URL = 'https://github.com/vincentino1/frontend.git'
 
         // Nexus Docker Registry
-        DOCKER_REPO           = 'myapp-docker-hosted'
-        REGISTRY_HOSTNAME     = '3-98-125-121.sslip.io'
-        REVERSE_PROXY_BASE_URL = 'https://3-98-125-121.sslip.io'
+        DOCKER_REPO_PUSH           = 'myapp-docker-hosted'
+        DOCKER_REPO_PULL           = 'myapp-docker-group'
         DOCKER_CREDENTIALS_ID = 'docker-registry-creds'
 
-        // Nexus npm registry configuration
-        NPM_REGISTRY_URL      = '3-98-125-121.sslip.io'
+        // NEXUS_URL & DOCKER_REGISTRY_URL are set as Jenkins environment variables
 
-        // Puppeteer skip download
-        PUPPETEER_SKIP_DOWNLOAD = 'true'
-        NODE_EXTRA_CA_CERTS      = "/etc/ssl/certs/ca-certificates.crt"
     }
 
     stages {
@@ -69,7 +65,7 @@ pipeline {
                 git(
                     branch: "${env.branchName}",
                     credentialsId: "${env.GIT_CREDENTIALS}",
-                    url: 'https://github.com/vincentino1/frontend.git'
+                    url: "${env.GIT_BRANCH_URL}"
                 )
             }
         }
@@ -78,14 +74,13 @@ pipeline {
             steps {
                 dir('angular-app') {
                     withCredentials([
-                        string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'NPM_TOKEN')
+                        string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'TOKEN')
                     ]) {
                         writeFile file: '.npmrc',
                                   text: """
-registry=https://${REGISTRY_HOSTNAME}/repository/myapp-npm-group/
+registry=https://${NEXUS_URL}/repository/myapp-npm-group/
 always-auth=true
-//${REGISTRY_HOSTNAME}/repository/myapp-npm-group/:_auth=${NPM_TOKEN}
-email=jenkins@example.com
+//${NEXUS_URL}/repository/myapp-npm-group/:_auth=${TOKEN}
 """
                         // Install Angular CLI and npm packages
                         sh 'npm install -g @angular/cli@latest'
@@ -106,9 +101,7 @@ email=jenkins@example.com
         stage('Unit Tests') {
             steps {
                 dir('angular-app') {
-                    withEnv(['CHROME_BIN=$(node -p "require(\'puppeteer\').executablePath()")']) {
                         sh 'npm run test:ci'
-                    }
                 }
             }
         }
@@ -129,10 +122,11 @@ email=jenkins@example.com
                         def appName = pkg.name
                         def appVersion = pkg.version
 
-                        env.IMAGE_NAME = "${REGISTRY_HOSTNAME}/${DOCKER_REPO}/${appName}:v${appVersion}-${BUILD_NUMBER}"
-
-                        docker.withRegistry("${REVERSE_PROXY_BASE_URL}", "${DOCKER_CREDENTIALS_ID}") {
-                            docker.build(env.IMAGE_NAME, '.')
+                        env.IMAGE_NAME = "${env.DOCKER_REGISTRY_URL}/${env.DOCKER_REPO_PUSH}/${appName}:v${appVersion}-${env.BUILD_NUMBER}"
+                        
+                        docker.withRegistry("https://${env.DOCKER_REGISTRY_URL}", "${env.DOCKER_CREDENTIALS_ID}") {
+                           
+                            docker.build(env.IMAGE_NAME, "--build-arg DOCKER_PRIVATE_REPO=${env.NEXUS_URL}/${env.DOCKER_REPO_PULL} .")
                         }
 
                         echo "Built image: ${env.IMAGE_NAME}"
@@ -147,7 +141,7 @@ email=jenkins@example.com
             }
             steps {
                 script {
-                    docker.withRegistry("${REVERSE_PROXY_BASE_URL}", "${DOCKER_CREDENTIALS_ID}") {
+                    docker.withRegistry("https://${env.DOCKER_REGISTRY_URL}", "${env.DOCKER_CREDENTIALS_ID}") {
                         docker.image(env.IMAGE_NAME).push()
                         docker.image(env.IMAGE_NAME).push('latest')
                     }
