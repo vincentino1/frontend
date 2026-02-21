@@ -117,13 +117,13 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            dir('angular-app') {
-                sh 'rm -f .npmrc'
-            }
-        }
-    }
+    // post {
+    //     always {
+    //         dir('angular-app') {
+    //             sh 'rm -f .npmrc'
+    //         }
+    //     }
+    // }
 }
 
         stage('Build Docker Image') {
