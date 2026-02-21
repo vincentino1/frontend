@@ -71,29 +71,14 @@ pipeline {
             }
         }
 
-        stage('Debug') {
-    steps {
-        sh 'pwd'
-        sh 'ls -la'
-    }
-}
-        
         stage('Install Dependencies') {
             steps {
                 dir('angular-app') {
-                    withCredentials([
-                        string(credentialsId: 'NEXUS_NPM_TOKEN', variable: 'TOKEN')
-                    ]) {
-                        writeFile file: '.npmrc',
-                                  text: """
-registry=https://${NEXUS_URL}/repository/myapp-npm-group/
-always-auth=true
-//${NEXUS_URL}/repository/myapp-npm-group/:_auth=${TOKEN}
-"""
-                        // Install Angular CLI and npm packages
-                        sh 'npm install -g @angular/cli@latest'
-                        sh 'npm install --no-audit --no-fund'
-                        sh 'npm whoami'  // Verify auth
+
+                    withNPM(npmrcConfig:'my-custom-npmrc') {
+                        echo "Performing npm build..."
+                        sh 'npm install'
+                        sh 'npm whoami'
                     }
                 }
             }
