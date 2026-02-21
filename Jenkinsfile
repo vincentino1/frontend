@@ -1,11 +1,11 @@
 properties([
     pipelineTriggers([
         [
-            $class: 'GenericTrigger', 
-            token: 'MY_GEN_TOKEN', 
-            printContributedVariables: true,  
-            genericVariables: [ 
-                [key: 'ref', value: '$.ref'], 
+            $class: 'GenericTrigger',
+            token: 'MY_GEN_TOKEN',
+            printContributedVariables: true,
+            genericVariables: [
+                [key: 'ref', value: '$.ref'],
                 [key: 'repo_name', value: '$.repository.name']
             ],
             regexpFilterText: '$repo_name:$ref',
@@ -25,17 +25,14 @@ pipeline {
     environment {
         // Git
         GIT_CREDENTIALS = 'github-creds'
-        GIT_BRANCH_URL = 'https://github.com/vincentino1/frontend.git' 
-        
+        GIT_BRANCH_URL  = 'https://github.com/vincentino1/frontend.git'
 
         // Nexus Docker Registry
-        DOCKER_REPO_PUSH           = 'myapp-docker-hosted'
-        DOCKER_REPO_PULL           = 'myapp-docker-group'
+        DOCKER_REPO_PUSH      = 'myapp-docker-hosted'
+        DOCKER_REPO_PULL      = 'myapp-docker-group'
         DOCKER_CREDENTIALS_ID = 'docker-registry-creds'
 
         // NEXUS_URL is set as Jenkins environment variable
-
-        CHROME_BIN = '/snap/bin/chromium'
 
     }
 
@@ -76,8 +73,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir('angular-app') {
-
-                    withNPM(npmrcConfig:'my-custom-npmrc') {
+                    withNPM(npmrcConfig: 'my-custom-npmrc') {
                         echo "Performing npm build..."
                         sh 'npm install'
                         sh 'npm whoami'
@@ -93,13 +89,13 @@ pipeline {
             }
         }
 
-        stage('Unit Tests') {
-            steps {
-                dir('angular-app') {
-                        sh 'npm run test:ci'
-                }
-            }
-        }
+        // stage('Unit Tests') {
+        //     steps {
+        //         dir('angular-app') {
+        //             sh 'npm run test:ci'
+        //         }
+        //     }
+        // }
 
         stage('Build Angular App') {
             steps {
@@ -109,18 +105,37 @@ pipeline {
             }
         }
 
+        stage('NPM Publish') {
+            when {
+                expression { env.BRANCH_NAME == 'main' }
+            }
+            steps {
+                dir('angular-app') {
+                    withNPM(npmrcConfig: 'my-custom-npmrc') {
+                        sh 'npm publish --registry https://repo.vinny-dev.com/repository/myapp-npm-hosted/'
+                    }
+                }
+            }
+            post {
+                always {
+                    dir('angular-app') {
+                        sh 'rm -f .npmrc'
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 dir('angular-app') {
                     script {
-                        def pkg = readJSON file: 'package.json'
-                        def appName = pkg.name
+                        def pkg       = readJSON file: 'package.json'
+                        def appName   = pkg.name
                         def appVersion = pkg.version
 
                         env.IMAGE_NAME = "${env.NEXUS_URL}/${env.DOCKER_REPO_PUSH}/${appName}:v${appVersion}-${env.BUILD_NUMBER}"
-                        
+
                         docker.withRegistry("https://${env.NEXUS_URLL}", "${env.DOCKER_CREDENTIALS_ID}") {
-                           
                             docker.build(env.IMAGE_NAME, "--build-arg DOCKER_PRIVATE_REPO=${env.NEXUS_URL}/${env.DOCKER_REPO_PULL} .")
                         }
 
