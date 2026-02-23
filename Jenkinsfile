@@ -121,11 +121,11 @@ pipeline {
 
 stage('Build Docker Image') {
     steps {
-        // configFileProvider writes the .npmrc into your workspace on the Jenkins agent.
+        // Write managed .npmrc into workspace
         configFileProvider([configFile(fileId: 'my-custom-npmrc', targetLocation: 'angular-app/.npmrc')]) {
             script {
-                def pkg        = readJSON file: 'angular-app/package.json'
-                def appName    = pkg.name
+                def pkg = readJSON file: 'angular-app/package.json'
+                def appName = pkg.name
                 def appVersion = pkg.version
 
                 env.IMAGE_NAME = "${env.NEXUS_URL}/${env.DOCKER_REPO_PUSH}/${appName}:v${appVersion}-${env.BUILD_NUMBER}"
