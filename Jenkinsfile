@@ -100,6 +100,7 @@ pipeline {
 
                         if (pkg.private) {
                             echo "Package is private — skipping npm publish."
+                            currentBuild.result = 'SUCCESS'  // ensures Jenkins does not mark stage as failed
                         } else {
                             withNPM(npmrcConfig: 'my-custom-npmrc') {
                                 sh 'npm publish'
