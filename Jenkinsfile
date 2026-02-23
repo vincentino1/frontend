@@ -119,26 +119,29 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    def pkg        = readJSON file: 'angular-app/package.json'
-                    def appName    = pkg.name
-                    def appVersion = pkg.version
+stage('Build Docker Image') {
+    steps {
+        // Make npm auth available in this block
+        withNPM(npmrcConfig: 'my-custom-npmrc') {
+            script {
+                def pkg        = readJSON file: 'angular-app/package.json'
+                def appName    = pkg.name
+                def appVersion = pkg.version
 
-                    env.IMAGE_NAME = "${env.NEXUS_URL}/${env.DOCKER_REPO_PUSH}/${appName}:v${appVersion}-${env.BUILD_NUMBER}"
+                env.IMAGE_NAME = "${env.NEXUS_URL}/${env.DOCKER_REPO_PUSH}/${appName}:v${appVersion}-${env.BUILD_NUMBER}"
 
-                    docker.withRegistry("https://${env.NEXUS_URL}", "${env.DOCKER_CREDENTIALS_ID}") {
-                        docker.build(
-                            env.IMAGE_NAME,
-                            "--build-arg DOCKER_PRIVATE_REPO=${env.NEXUS_URL}/${env.DOCKER_REPO_PULL} ."
-                        )
-                    }
-
-                    echo "Built image: ${env.IMAGE_NAME}"
+                docker.withRegistry("https://${env.NEXUS_URL}", "${env.DOCKER_CREDENTIALS_ID}") {
+                    docker.build(
+                        env.IMAGE_NAME,
+                        "--build-arg DOCKER_PRIVATE_REPO=${env.NEXUS_URL}/${env.DOCKER_REPO_PULL} ."
+                    )
                 }
+
+                echo "Built image: ${env.IMAGE_NAME}"
             }
         }
+    }
+}
 
         stage('Push Docker Image to Nexus') {
             when {
