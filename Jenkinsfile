@@ -122,7 +122,7 @@ pipeline {
 stage('Build Docker Image') {
     steps {
         // configFileProvider writes the .npmrc into your workspace on the Jenkins agent.
-        configFileProvider([configFile(fileId: 'my-custom-npmrc-id', targetLocation: 'angular-app/.npmrc')]) {
+        configFileProvider([configFile(fileId: 'my-custom-npmrc', targetLocation: 'angular-app/.npmrc')]) {
             script {
                 def pkg        = readJSON file: 'angular-app/package.json'
                 def appName    = pkg.name
