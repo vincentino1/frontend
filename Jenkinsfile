@@ -129,7 +129,7 @@ pipeline {
 
                         env.IMAGE_NAME = "${env.NEXUS_URL}/${env.DOCKER_REPO_PUSH}/${appName}:v${appVersion}-${env.BUILD_NUMBER}"
 
-                        docker.withRegistry('https://${env.NEXUS_URL}', '${env.DOCKER_CREDENTIALS_ID}') {
+                        docker.withRegistry("https://${env.NEXUS_URL}", "${env.DOCKER_CREDENTIALS_ID}") {
                             docker.build( env.IMAGE_NAME,
                                 "--build-arg DOCKER_PRIVATE_REPO=${env.NEXUS_URL}/${env.DOCKER_REPO_PULL} ."
                             )
@@ -147,7 +147,7 @@ pipeline {
             }
             steps {
                 script {
-                    docker.withRegistry('https://${env.NEXUS_URL}', '${env.DOCKER_CREDENTIALS_ID}') {
+                    docker.withRegistry("https://${env.NEXUS_URL}", "${env.DOCKER_CREDENTIALS_ID}") {
                         docker.image(env.IMAGE_NAME).push()
                         docker.image(env.IMAGE_NAME).push('latest')
                     }
