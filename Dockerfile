@@ -15,7 +15,7 @@ COPY angular-app/package*.json ./
 COPY angular-app/.npmrc ./
 
 # Install exact dependency versions from package-lock.json
-RUN npm install
+RUN npm install && rm -f .npmrc
 
 # Copy the rest of the Angular source files
 COPY angular-app/ ./
