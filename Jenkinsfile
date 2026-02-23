@@ -21,7 +21,7 @@ pipeline {
     tools {
         nodejs 'node20'
     }
-
+  
     environment {
         // Git
         GIT_CREDENTIALS = 'github-creds'
@@ -76,14 +76,6 @@ pipeline {
                     withNPM(npmrcConfig: 'my-custom-npmrc') {
                         echo "Performing npm build..."
                         sh 'npm install'
-                        sh 'npm whoami'
-                    }
-                }
-            }
-            post {
-                always {
-                    dir('angular-app') {
-                        sh 'rm -f .npmrc'
                     }
                 }
             }
@@ -129,8 +121,7 @@ pipeline {
                         env.IMAGE_NAME = "${env.NEXUS_URL}/${env.DOCKER_REPO_PUSH}/${appName}:v${appVersion}-${env.BUILD_NUMBER}"
 
                         docker.withRegistry('https://${env.NEXUS_URL}', '${env.DOCKER_CREDENTIALS_ID}') {
-                            docker.build(
-                                env.IMAGE_NAME,
+                            docker.build( env.IMAGE_NAME,
                                 "--build-arg DOCKER_PRIVATE_REPO=${env.NEXUS_URL}/${env.DOCKER_REPO_PULL} ."
                             )
                         }
