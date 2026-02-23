@@ -17,8 +17,8 @@ COPY angular-app/.npmrc ./
 # Install exact dependency versions from package-lock.json
 RUN npm install
 
-# Copy all application source files into the container
-COPY . .
+# Copy the rest of the Angular source files
+COPY angular-app/ ./
 
 # Build Angular app (Angular 17 defaults to production build)
 RUN npm run build 
