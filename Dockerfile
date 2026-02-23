@@ -9,7 +9,7 @@ FROM ${DOCKER_PRIVATE_REPO}/node:20-alpine AS builder
 WORKDIR /app
 
 # Copy only the dependency files first to optimize Docker caching
-COPY package*.json ./
+COPY angular-app/package*.json ./
 
 # Install exact dependency versions from package-lock.json
 RUN npm install
