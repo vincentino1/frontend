@@ -12,7 +12,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install exact dependency versions from package-lock.json
-RUN npm ci 
+RUN npm install
 
 # Copy all application source files into the container
 COPY . .
