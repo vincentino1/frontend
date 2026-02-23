@@ -11,6 +11,9 @@ WORKDIR /app
 # Copy only the dependency files first to optimize Docker caching
 COPY angular-app/package*.json ./
 
+# Copy .npmrc so npm inside Docker can authenticate with the private Nexus registry
+COPY angular-app/.npmrc ./
+
 # Install exact dependency versions from package-lock.json
 RUN npm install
 
