@@ -108,7 +108,7 @@ pipeline {
 
                         if (pkg.private) {
                             echo "Package is private — skipping npm publish."
-                            currentBuild.result = 'SUCCESS'  // ensures Jenkins does not mark stage as failed
+                            currentBuild.result = 'SUCCESS'
                         } else {
                             withNPM(npmrcConfig: 'my-custom-npmrc') {
                                 sh 'npm publish'
@@ -119,29 +119,43 @@ pipeline {
             }
         }
 
-stage('Build Docker Image') {
-    steps {
-        // Write managed .npmrc into workspace
-        configFileProvider([configFile(fileId: 'my-custom-npmrc', targetLocation: 'angular-app/.npmrc')]) {
-            script {
-                def pkg = readJSON file: 'angular-app/package.json'
-                def appName = pkg.name
-                def appVersion = pkg.version
-
-                env.IMAGE_NAME = "${env.NEXUS_URL}/${env.DOCKER_REPO_PUSH}/${appName}:v${appVersion}-${env.BUILD_NUMBER}"
-
-                docker.withRegistry("https://${env.NEXUS_URL}", "${env.DOCKER_CREDENTIALS_ID}") {
-                    docker.build(
-                        env.IMAGE_NAME,
-                        "--build-arg DOCKER_PRIVATE_REPO=${env.NEXUS_URL}/${env.DOCKER_REPO_PULL} ."
+        stage('Build Docker Image') {
+            steps {
+                // Write managed .npmrc into workspace
+                configFileProvider([
+                    configFile(
+                        fileId: 'my-custom-npmrc',
+                        targetLocation: 'angular-app/.npmrc'
                     )
-                }
+                ]) {
+                    script {
+                        def pkg = readJSON file: 'angular-app/package.json'
+                        def appName = pkg.name
+                        def appVersion = pkg.version
 
-                echo "Built image: ${env.IMAGE_NAME}"
+                        env.IMAGE_NAME = "${env.NEXUS_URL}/${env.DOCKER_REPO_PUSH}/${appName}:v${appVersion}-${env.BUILD_NUMBER}"
+
+                        docker.withRegistry(
+                            "https://${env.NEXUS_URL}",
+                            "${env.DOCKER_CREDENTIALS_ID}"
+                        ) {
+                            docker.build(
+                                env.IMAGE_NAME,
+                                "--build-arg DOCKER_PRIVATE_REPO=${env.NEXUS_URL}/${env.DOCKER_REPO_PULL} ."
+                            )
+                        }
+
+                        echo "Built image: ${env.IMAGE_NAME}"
+                    }
+                }
+            }
+
+            post {
+                always {
+                    sh 'rm -f .npmrc'
+                }
             }
         }
-    }
-}
 
         stage('Push Docker Image to Nexus') {
             when {
@@ -149,7 +163,10 @@ stage('Build Docker Image') {
             }
             steps {
                 script {
-                    docker.withRegistry("https://${env.NEXUS_URL}", "${env.DOCKER_CREDENTIALS_ID}") {
+                    docker.withRegistry(
+                        "https://${env.NEXUS_URL}",
+                        "${env.DOCKER_CREDENTIALS_ID}"
+                    ) {
                         docker.image(env.IMAGE_NAME).push()
                         docker.image(env.IMAGE_NAME).push('latest')
                     }
@@ -158,7 +175,6 @@ stage('Build Docker Image') {
                 }
             }
         }
-
     }
 
     post {
