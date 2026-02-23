@@ -121,8 +121,8 @@ pipeline {
 
 stage('Build Docker Image') {
     steps {
-        // Make npm auth available in this block
-        withNPM(npmrcConfig: 'my-custom-npmrc') {
+        // configFileProvider writes the .npmrc into your workspace on the Jenkins agent.
+        configFileProvider([configFile(fileId: 'my-custom-npmrc-id', targetLocation: 'angular-app/.npmrc')]) {
             script {
                 def pkg        = readJSON file: 'angular-app/package.json'
                 def appName    = pkg.name
