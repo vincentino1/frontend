@@ -91,7 +91,9 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'npm run build'
+                dir('angular-app'){
+                    sh 'npm run build'
+                }                    
             }
         }
 
