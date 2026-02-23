@@ -108,7 +108,7 @@ pipeline {
 
                         if (pkg.private) {
                             echo "Package is private — skipping npm publish."
-                            currentBuild.result = 'SUCCESS'
+                            // currentBuild.result = 'SUCCESS'
                         } else {
                             withNPM(npmrcConfig: 'my-custom-npmrc') {
                                 sh 'npm publish'
