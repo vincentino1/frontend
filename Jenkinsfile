@@ -104,7 +104,7 @@ pipeline {
             steps {
                 dir('angular-app') {
                     script {
-                        def pkg = readJSON file: 'package.json'
+                        def pkg = readJSON file: 'angular-app/package.json'
 
                         if (pkg.private) {
                             echo "Package is private — skipping npm publish."
