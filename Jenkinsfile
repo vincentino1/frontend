@@ -14,14 +14,14 @@ properties([
         ]
     ])
 ])
-  
+
 pipeline {
     agent any
 
     tools {
         nodejs 'node20'
     }
-  
+
     environment {
         // Git
         GIT_CREDENTIALS = 'github-creds'
@@ -91,9 +91,9 @@ pipeline {
 
         stage('Build') {
             steps {
-                dir('angular-app'){
+                dir('angular-app') {
                     sh 'npm run build'
-                }                    
+                }
             }
         }
 
@@ -121,22 +121,21 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                dir('angular-app') {
-                    script {
-                        def pkg        = readJSON file: 'package.json'
-                        def appName    = pkg.name
-                        def appVersion = pkg.version
+                script {
+                    def pkg        = readJSON file: 'package.json'
+                    def appName    = pkg.name
+                    def appVersion = pkg.version
 
-                        env.IMAGE_NAME = "${env.NEXUS_URL}/${env.DOCKER_REPO_PUSH}/${appName}:v${appVersion}-${env.BUILD_NUMBER}"
+                    env.IMAGE_NAME = "${env.NEXUS_URL}/${env.DOCKER_REPO_PUSH}/${appName}:v${appVersion}-${env.BUILD_NUMBER}"
 
-                        docker.withRegistry("https://${env.NEXUS_URL}", "${env.DOCKER_CREDENTIALS_ID}") {
-                            docker.build( env.IMAGE_NAME,
-                                "--build-arg DOCKER_PRIVATE_REPO=${env.NEXUS_URL}/${env.DOCKER_REPO_PULL} ."
-                            )
-                        }
-
-                        echo "Built image: ${env.IMAGE_NAME}"
+                    docker.withRegistry("https://${env.NEXUS_URL}", "${env.DOCKER_CREDENTIALS_ID}") {
+                        docker.build(
+                            env.IMAGE_NAME,
+                            "--build-arg DOCKER_PRIVATE_REPO=${env.NEXUS_URL}/${env.DOCKER_REPO_PULL} ."
+                        )
                     }
+
+                    echo "Built image: ${env.IMAGE_NAME}"
                 }
             }
         }
@@ -156,6 +155,7 @@ pipeline {
                 }
             }
         }
+
     }
 
     post {
