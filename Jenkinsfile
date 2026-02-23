@@ -104,7 +104,7 @@ pipeline {
             steps {
                 dir('angular-app') {
                     script {
-                        def pkg = readJSON file: 'angular-app/package.json'
+                        def pkg = readJSON file: 'package.json'
 
                         if (pkg.private) {
                             echo "Package is private — skipping npm publish."
@@ -122,7 +122,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def pkg        = readJSON file: 'package.json'
+                    def pkg        = readJSON file: 'angular-app/package.json'
                     def appName    = pkg.name
                     def appVersion = pkg.version
 
