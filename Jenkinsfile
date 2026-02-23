@@ -89,7 +89,13 @@ pipeline {
         //     }
         // }
 
-        stage('NPM Publish') {
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+
+        stage('Publish NPM Package') {
             when {
                 expression { env.branchName == 'main' }
             }
